@@ -1,0 +1,61 @@
+# Gather the Company Hash from the boss (aka the user)
+Write-Output "Greetings earthling, I need your company hash to proceed with the installation."
+$CompanyHash = Read-Host "Enter your company hash, or face the consequences: "
+
+# If it's already installed, just do nothing. We don't want to break anything, do we?
+$Installed = Get-ItemProperty "HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\*" | 
+Where-Object { $_.DisplayName -eq "Bitdefender Endpoint Security Tools" }
+
+if ($Installed) {
+    Write-Output "Bitdefender already installed. Phew, crisis averted!"
+    Exit 0
+}
+
+# We're ready to go! Let's form the URL for the installer file
+$BitdefenderURL = "setupdownloader_[$CompanyHash].exe"
+$BaseURL = "https://cloud.gravityzone.bitdefender.com/Packages/BSTWIN/0/"
+$URL = $BaseURL + $BitdefenderURL
+$Destination = 'C:\Windows\Temp\setupdownloader.exe'
+
+# Let's get this party started! Time to download the installer
+try 
+{
+    Write-Output "Beginning download of Bitdefender to $Destination. Hold on to your horses!"
+[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+    Invoke-WebRequest -Uri $URL -OutFile $Destination
+}
+catch
+{
+    Write-Output "Error Downloading - $_.Exception.Response.StatusCode.value_"
+    Write-Output $_
+    Write-Output "Woops, something went wrong with the download. Better luck next time!"
+    Exit 1
+}
+
+# Check if a previous attempt failed, leaving the installer in the temp directory and breaking the script
+$FullDestination = "$DestinationPath\setupdownloader_[$CompanyHash].exe"
+if (Test-Path $FullDestination) {
+   Remove-Item $FullDestination
+   Write-Out "Removed $FullDestination... because why not?"
+}
+
+# Rename the installer file and get ready for the installation!
+Rename-Item -Path $Destination -NewName "setupdownloader_[$CompanyHash].exe"
+Write-Output "Download succeeded, buckle up, the installation is about to begin!"
+Start-Process -FilePath "C:\Windows\Temp\$BitdefenderURL" -ArgumentList "/bdparams /silent silent" -Wait -NoNewWindow
+
+# Wait an additional 30 seconds after the installer process completes to verify installation
+Start-Sleep -Seconds 30
+
+# Did it work? Let's check!
+$Installed = Get-ItemProperty "HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\*" | 
+Where-Object { $_.DisplayName -eq "Bitdefender Endpoint Security Tools" }
+
+if ($Installed) {
+    Write-Output "Bitdefender successfully installed. Hooray, we did it!"
+    Exit 0
+}
+else {
+    Write-Output "ERROR: Failed to install Bitdefender. Oh no, what do we do now?"
+    Exit 1
+}
