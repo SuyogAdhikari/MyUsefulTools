@@ -1,8 +1,8 @@
 # The Ultimate  Automation Toolbox
 
-Welcome to the Ultimate Network/System Automation Toolbox! This repository is your one-stop-shop for all the tools you need to make your life as a network/system administrator/engineer a whole lot easier.
+Welcome to the Ultimate Network/System Administration Toolbox! This repository is your one-stop-shop for all the tools you might need to make your life as a network/system administrator/engineer a whole lot easier.
 
-We've got everything you need to automate your network and systems, from simple scripts to complex tools. And if by some chance we don't have what you're looking for, don't worry. Things may change, and we're always on the lookout for new and exciting ways to make your life easier. 
+We've got everything you need to automate your network and systems, do simple tasks, from simple scripts to complex tools. And if by some chance we don't have what you're looking for, don't worry. Things may change, and we're always on the lookout for new and exciting ways to make your life easier. 
 
 So go ahead, grab a cup of coffee, relax, and let us do the hard work for you.
 
